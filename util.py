@@ -16,3 +16,7 @@ def runCmd(cmd):
         p.stdout.close()
         p.stderr.close()
 
+def get_IP():
+    myname = socket.getfqdn(socket.gethostname())
+    myaddr = socket.gethostbyname(myname)
+    return myaddr
