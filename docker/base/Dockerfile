@@ -1,18 +1,10 @@
-FROM python:slim
+FROM kvmprashanth/filebench:v5
+
+RUN apt-get update && apt-get install -y python3
 
 RUN mkdir -p /home/storage
 
-RUN pip3 install
+RUN pip3 install --upgrade pip
 
 RUN pip3 install grpcio protobuf grpcio-tools
-
-RUN apt-get update -y
-
-RUN apt-get install -y gcc flex bison make
-
-ADD filebench-1.5-alpha3.tar.gz /home/
-
-RUN cd /home && ls
-
-RUN cd /home/filebench-1.5-alpha3 && ./configure && make && make install
 

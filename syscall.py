@@ -16,7 +16,7 @@ LTTNG_HOME = '/root/lttng-traces'
 mounts = ['/home/nfs1', '/home/nfs2']
 
 
-def run_container(path, port, mount='/tmp', image='mybench'):
+def run_container(path, port, mount='/tmp', image='mybench-new'):
     output = runCmd('docker run -d -v %s:%s -p %s:%s %s' % (path, mount, port, DEFAULT_PORT, image))
     return output[0]
 

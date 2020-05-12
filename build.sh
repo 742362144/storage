@@ -6,7 +6,7 @@ cd $SHELL_FOLDER
 cp -rf filebench-1.5-alpha3.tar.gz docker/base
 cd docker/base
 
-docker build -t mybench-base .
+docker build -t mybench-base-new .
 
 cd $SHELL_FOLDER
 
@@ -18,4 +18,4 @@ cp -rf *.py Dockerfile cmdcall.proto start.sh docker/
 
 
 cd docker
-docker build -t mybench .
+docker build -t mybench-new .
