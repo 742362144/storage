@@ -1,4 +1,4 @@
-FROM mybench-base-new:latest
+FROM mybench-base:latest
 
 ADD *.py /home/storage/
 

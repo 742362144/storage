@@ -3,8 +3,8 @@
 SHELL_FOLDER=$(cd "$(dirname "$0")";pwd)
 cd $SHELL_FOLDER
 
-cp -rf filebench-1.5-alpha3.tar.gz docker/base
-cd docker/base
+#cp -rf filebench-1.5-alpha3.tar.gz docker/base
+#cd docker/base
 
 docker build -t mybench-base .
 
@@ -16,6 +16,5 @@ python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. cmdcall.proto
 
 cp -rf *.py Dockerfile cmdcall.proto start.sh docker/
 
-
 cd docker
-docker build -t mybench-new .
+docker build -t mybench .
