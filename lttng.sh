@@ -3,7 +3,7 @@
 SHELL_FOLDER=$(cd "$(dirname "$0")";pwd)
 cd $SHELL_FOLDER
 
-yum install -y libuuid libxml2 libxml2-devel popt-devel
+yum install -y gcc libuuid libxml2 libxml2-devel popt-devel  autoconf automake libtool
 
 git clone git://git.liburcu.org/userspace-rcu.git
 
@@ -15,6 +15,9 @@ make && make install
 ldconfig
 make clean && make distclean
 
+# uname -r
+# https://linuxsoft.cern.ch/cern/centos/7/updates/x86_64/repoview/kernel-devel.html
+# rpm -Uvh --oldpackage kernel-devel*
 
 cd $(mktemp -d) &&
 wget http://lttng.org/files/lttng-modules/lttng-modules-latest-2.12.tar.bz2 &&

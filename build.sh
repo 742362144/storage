@@ -4,7 +4,7 @@ SHELL_FOLDER=$(cd "$(dirname "$0")";pwd)
 cd $SHELL_FOLDER
 
 #cp -rf filebench-1.5-alpha3.tar.gz docker/base
-#cd docker/base
+cd docker/base
 
 docker build -t mybench-base .
 

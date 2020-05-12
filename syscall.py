@@ -31,7 +31,7 @@ def get_container_pids(cid):
 
 
 def filebench(workload, host, port):
-    output = rpcCall('filebench -f /home/filebench-1.5-alpha3/workloads/%s.f' % workload, host=host, port=port)
+    output = rpcCall('filebench -f /usr/local/share/filebench/workloads/%s.f' % workload, host=host, port=port)
     return output
 
 
