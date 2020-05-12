@@ -54,13 +54,13 @@ class CmdCallServicer(cmdcall_pb2_grpc.CmdCallServicer):
             print(cmd)
             op = Operation(cmd, {})
             lines = op.execute()
-
-            return cmdcall_pb2.CallResponse(
-                json=dumps({'result': {'code': 0, 'msg': 'rpc call kubesds-adm cmd %s successful.' % cmd}, 'data': lines}))
+            if lines:
+                return cmdcall_pb2.CallResponse(output=dumps(lines))
+            else:
+                return cmdcall_pb2.CallResponse(output="[]")
         except Exception:
             traceback.print_exc()
-            return cmdcall_pb2.CallResponse(
-                json=dumps({'result': {'code': 1, 'msg': 'rpc call kubesds-adm cmd failure %s' % traceback.format_exc()}, 'data': {}}))
+            return cmdcall_pb2.CallResponse(output=traceback.format_exc())
 
 def run_server():
     # 多线程服务器
