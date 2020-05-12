@@ -6,7 +6,7 @@ cd $SHELL_FOLDER
 cp -rf filebench-1.5-alpha3.tar.gz docker/base
 cd docker/base
 
-docker build -t mybench-base-new .
+docker build -t mybench-base .
 
 cd $SHELL_FOLDER
 
