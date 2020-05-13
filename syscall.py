@@ -75,6 +75,47 @@ def parse_syscall(record_dir):
     return record
 
 
+# def benchmark(mount_paths):
+#     # start container
+#     result = {}
+#     containers = {}
+#     ports = set()
+#     i = 1
+#     try:
+#         for path in mount_paths:
+#             port = random.randint(19000, 20000)
+#             while port in ports:
+#                 port = random.randint(19000, 20000)
+#             ports.add(port)
+#             cid = run_container(path, port)
+#
+#             time.sleep(10)
+#
+#             containers[cid] = port
+#             i += 1
+#             result[i] = {}
+#             threads = {}
+#             for id in containers.keys():
+#                 # t = MyThread(collect_syscall, args=(id, filebench, '192.168.137.187', containers[id], 'webserver'))
+#                 t = MyThread(filebench, args=('webserver', '192.168.137.187', containers[id]))
+#                 t.start()
+#                 # output, syscalls = collect_syscall(id, filebench, '192.168.137.187', containers[id], 'webserver')
+#                 threads[id] = t
+#
+#             for id in threads.keys():
+#                 threads[id].join()
+#
+#             for id in threads.keys():
+#                 output, syscalls = threads[id].get_result()
+#                 result[i][id] = {}
+#                 result[i][id]['output'] = output
+#                 result[i][id]['syscalls'] = syscalls
+#     except Exception:
+#         for id in containers.keys():
+#             runCmd('docker rm -f %s' % id)
+#         pass
+#     print(result)
+
 def benchmark(mount_paths):
     # start container
     result = {}
@@ -90,24 +131,23 @@ def benchmark(mount_paths):
             cid = run_container(path, port)
 
             time.sleep(10)
+
             containers[cid] = port
             i += 1
             result[i] = {}
             threads = {}
             for id in containers.keys():
-                t = MyThread(collect_syscall, args=(id, filebench, '192.168.137.187', containers[id], 'webserver'))
+                t = MyThread(filebench, args=('webserver', '192.168.137.187', containers[id]))
                 t.start()
-                # output, syscalls = collect_syscall(id, filebench, '192.168.137.187', containers[id], 'webserver')
                 threads[id] = t
 
             for id in threads.keys():
                 threads[id].join()
 
             for id in threads.keys():
-                output, syscalls = threads[id].get_result()
+                output = threads[id].get_result()
                 result[i][id] = {}
                 result[i][id]['output'] = output
-                result[i][id]['syscalls'] = syscalls
     except Exception:
         for id in containers.keys():
             runCmd('docker rm -f %s' % id)

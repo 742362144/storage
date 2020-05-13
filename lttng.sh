@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 
+# rpm -e --nodeps
+
 SHELL_FOLDER=$(cd "$(dirname "$0")";pwd)
 cd $SHELL_FOLDER
 
 yum install -y gcc libuuid libxml2 libxml2-devel popt-devel  autoconf automake libtool
 
 git clone git://git.liburcu.org/userspace-rcu.git
+
 
 cd userspace-rcu
 
