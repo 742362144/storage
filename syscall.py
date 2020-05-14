@@ -13,10 +13,19 @@ DOCKER_DIR = '/sys/fs/cgroup/memory/docker'
 TRACE_DIR = '/root/'
 LTTNG_HOME = '/root/lttng-traces'
 
-mounts = ['/home/nfs1', '/home/nfs2']
+# mounts = ['/var/lib/libvirt/cstor/nfs1', '/var/lib/libvirt/cstor/nfs2',
+#           '/var/lib/libvirt/cstor/nfs3', '/var/lib/libvirt/cstor/nfs4', '/var/lib/libvirt/cstor/nfs5']
+
+mounts = [
+    '/home/nfs1/glusterfs/glusterfs1',
+    '/home/nfs1/glusterfs/glusterfs2',
+    '/home/nfs1/glusterfs/glusterfs3',
+    '/home/nfs1/glusterfs/glusterfs4',
+    '/home/nfs1/glusterfs/glusterfs5',
+]
 
 
-def run_container(path, port, mount='/tmp', image='mybench-new'):
+def run_container(path, port, mount='/tmp', image='mybench'):
     output = runCmd('docker run -d -v %s:%s -p %s:%s %s' % (path, mount, port, DEFAULT_PORT, image))
     return output[0]
 
@@ -31,6 +40,7 @@ def get_container_pids(cid):
 
 
 def filebench(workload, host, port):
+    rpcCall("echo 'run times'>> /usr/local/share/filebench/workloads/%s.f" % workload, host=host, port=port)
     output = rpcCall('filebench -f /usr/local/share/filebench/workloads/%s.f' % workload, host=host, port=port)
     return output
 
@@ -57,6 +67,7 @@ def collect_syscall(cid, test, host, port, workload):
             syscalls = parse_syscall('%s/%s' % (LTTNG_HOME, dir))
             os.removedirs('%s/%s' % (LTTNG_HOME, dir))
     return output, syscalls
+
 
 def parse_syscall(record_dir):
     record = {}
@@ -116,7 +127,7 @@ def parse_syscall(record_dir):
 #         pass
 #     print(result)
 
-def benchmark(mount_paths):
+def benchmark(mount_paths, workload):
     # start container
     result = {}
     containers = {}
@@ -137,7 +148,7 @@ def benchmark(mount_paths):
             result[i] = {}
             threads = {}
             for id in containers.keys():
-                t = MyThread(filebench, args=('webserver', '192.168.137.187', containers[id]))
+                t = MyThread(filebench, args=(workload, get_IP(), containers[id]))
                 t.start()
                 threads[id] = t
 
@@ -148,10 +159,20 @@ def benchmark(mount_paths):
                 output = threads[id].get_result()
                 result[i][id] = {}
                 result[i][id]['output'] = output
+        for id in containers.keys():
+            runCmd('docker rm -f %s' % id)
+        print(result)
+        with open(workload, 'w') as f:
+            f.write(dumps(result))
     except Exception:
         for id in containers.keys():
             runCmd('docker rm -f %s' % id)
         pass
-    print(result)
 
-benchmark(mounts)
+
+benchmark(mounts, 'fileserver')
+benchmark(mounts, 'webserver')
+benchmark(mounts, 'randomread')
+benchmark(mounts, 'randomwrite')
+benchmark(mounts, 'randomrw')
+
