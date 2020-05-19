@@ -1,6 +1,7 @@
 import os
 import threading
 import time
+import traceback
 import uuid
 import random
 
@@ -13,20 +14,15 @@ DOCKER_DIR = '/sys/fs/cgroup/memory/docker'
 TRACE_DIR = '/root/'
 LTTNG_HOME = '/root/lttng-traces'
 
-# mounts = ['/var/lib/libvirt/cstor/nfs1', '/var/lib/libvirt/cstor/nfs2',
-#           '/var/lib/libvirt/cstor/nfs3', '/var/lib/libvirt/cstor/nfs4', '/var/lib/libvirt/cstor/nfs5']
-
-mounts = [
-    '/home/nfs1/glusterfs/glusterfs1',
-    '/home/nfs1/glusterfs/glusterfs2',
-    '/home/nfs1/glusterfs/glusterfs3',
-    '/home/nfs1/glusterfs/glusterfs4',
-    '/home/nfs1/glusterfs/glusterfs5',
-]
+mounts = ['/var/lib/libvirt/cstor/nfs1', '/var/lib/libvirt/cstor/nfs2',
+          '/var/lib/libvirt/cstor/nfs3', '/var/lib/libvirt/cstor/nfs4', '/var/lib/libvirt/cstor/nfs5'
+          , '/var/lib/libvirt/cstor/nfs6'
+          , '/var/lib/libvirt/cstor/nfs7'
+          , '/var/lib/libvirt/cstor/nfs8']
 
 
-def run_container(path, port, mount='/tmp', image='mybench'):
-    output = runCmd('docker run -d -v %s:%s -p %s:%s %s' % (path, mount, port, DEFAULT_PORT, image))
+def run_container(path, port, cpu, mount='/tmp', image='mybench'):
+    output = runCmd('docker run -d -m 1G --cpuset-cpus="%d" -v %s:%s -p %s:%s %s' % (cpu, path, mount, port, DEFAULT_PORT, image))
     return output[0]
 
 
@@ -139,8 +135,7 @@ def benchmark(mount_paths, workload):
             while port in ports:
                 port = random.randint(19000, 20000)
             ports.add(port)
-            cid = run_container(path, port)
-
+            cid = run_container(path, port, i+4)
             time.sleep(10)
 
             containers[cid] = port
@@ -165,14 +160,40 @@ def benchmark(mount_paths, workload):
         with open(workload, 'w') as f:
             f.write(dumps(result))
     except Exception:
+        traceback.print_exc()
         for id in containers.keys():
             runCmd('docker rm -f %s' % id)
         pass
 
+workloads = runCmd('ls /root/filebench-1.5-alpha3/workloads')
+print(workloads)
+for wk in workloads:
+    benchmark(mounts, wk.replace('.f', ''))
 
-benchmark(mounts, 'fileserver')
-benchmark(mounts, 'webserver')
-benchmark(mounts, 'randomread')
-benchmark(mounts, 'randomwrite')
-benchmark(mounts, 'randomrw')
+# workloads = ['fileserver', 'webserver', 'randomread']
+# for wk in workloads:
+#     benchmark(mounts, wk)
+# mounts = [
+#     '/home/nfs1/glusterfs/glusterfs1',
+#     '/home/nfs1/glusterfs/glusterfs2',
+#     '/home/nfs1/glusterfs/glusterfs3',
+#     '/home/nfs1/glusterfs/glusterfs4',
+#     '/home/nfs1/glusterfs/glusterfs5',
+# ]
+
+# benchmark(mounts, 'fileserver')
+# benchmark(mounts, 'webserver')
+# benchmark(mounts, 'randomread')
+# benchmark(mounts, 'randomwrite')
+# benchmark(mounts, 'randomrw')
+# benchmark(mounts, 'filemicro_seqread')
+# benchmark(mounts, 'filemicro_seqwrite')
+# benchmark(mounts, 'filemicro_seqwriterand')
+
+runCmd('cd /tmp/pycharm_project_533')
+runCmd('rm -rf nfs')
+runCmd('mkdir nfs')
+
+for wk in workloads:
+    runCmd('mv %s nfs/' % wk.replace('.f', ''))
 
