@@ -22,7 +22,9 @@ mounts = ['/var/lib/libvirt/cstor/nfs1', '/var/lib/libvirt/cstor/nfs2',
 
 
 def run_container(path, port, cpu, mount='/tmp', image='mybench'):
-    output = runCmd('docker run -d -m 1G --cpuset-cpus="%d" -v %s:%s -p %s:%s %s' % (cpu, path, mount, port, DEFAULT_PORT, image))
+    file_dir = '%s/%s' % (path, os.path.basename(path))
+    runCmd('mkdir %ss' % file_dir)
+    output = runCmd('docker run -d -m 1G --cpuset-cpus="%d" -v %s:%s -p %s:%s %s' % (cpu, file_dir, mount, port, DEFAULT_PORT, image))
     return output[0]
 
 
@@ -156,6 +158,8 @@ def benchmark(mount_paths, workload):
                 result[i][id]['output'] = output
         for id in containers.keys():
             runCmd('docker rm -f %s' % id)
+        for path in mount_paths:
+            runCmd('rm -rf %s/%s' % (path, os.path.basename(path)))
         print(result)
         with open(workload, 'w') as f:
             f.write(dumps(result))
@@ -163,6 +167,8 @@ def benchmark(mount_paths, workload):
         traceback.print_exc()
         for id in containers.keys():
             runCmd('docker rm -f %s' % id)
+        for path in mount_paths:
+            runCmd('rm -rf %s/%s' % (path, os.path.basename(path)))
         pass
 
 workloads = runCmd('ls /root/filebench-1.5-alpha3/workloads')

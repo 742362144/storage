@@ -46,6 +46,13 @@ def get_IP():
     myaddr = socket.gethostbyname(myname)
     return myaddr
 
+def collect_system_io():
+    pass
+
+def collect_system_net():
+    pass
+
+
 
 if __name__ == '__main__':
     print(get_IP())
