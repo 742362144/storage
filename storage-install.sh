@@ -11,3 +11,6 @@ gluster volume create glusterfs1 node30:/home/glusterfs/glusterfs1 force
 gluster volume start glusterfs1
 gluster volume stop glusterfs1
 gluster volume delete glusterfs1
+
+
+#mount -t glusterfs node30:glusterfs1 /home/nfs1/glusterfs/glusterfs1

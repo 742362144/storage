@@ -149,6 +149,8 @@ def benchmark(mount_paths, workload):
                 t.start()
                 threads[id] = t
 
+
+
             for id in threads.keys():
                 threads[id].join()
 

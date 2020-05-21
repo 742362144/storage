@@ -46,11 +46,8 @@ def get_IP():
     myaddr = socket.gethostbyname(myname)
     return myaddr
 
-def collect_system_io():
-    pass
-
-def collect_system_net():
-    pass
+def collect_system(cid):
+    runCmd('curl --unix-socket /var/run/docker.sock http://localhost/containers/%s/stats > res.txt' % cid)
 
 
 
