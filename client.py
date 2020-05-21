@@ -8,8 +8,8 @@ import cmdcall_pb2_grpc
 
 from util import *
 
-DEFAULT_PORT = '19999'
-HOST = '192.168.56.1'
+DEFAULT_PORT = '19350'
+HOST = '133.133.135.22'
 def rpcCall(cmd, host=HOST, port=DEFAULT_PORT):
     print(host)
     print(port)
@@ -41,4 +41,4 @@ def rpcCall(cmd, host=HOST, port=DEFAULT_PORT):
         traceback.print_exc()
 
 if __name__ == '__main__':
-    print(rpcCall('ls /', host='192.168.137.187', port='19218'))
+    print(rpcCall('ls /', host='133.133.135.22', port='19350'))

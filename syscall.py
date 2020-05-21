@@ -9,21 +9,28 @@ from client import rpcCall, HOST
 from server import DEFAULT_PORT
 from util import *
 
-cid = '012ecf7a708a'
 DOCKER_DIR = '/sys/fs/cgroup/memory/docker'
 TRACE_DIR = '/root/'
 LTTNG_HOME = '/root/lttng-traces'
 
 mounts = ['/var/lib/libvirt/cstor/nfs1', '/var/lib/libvirt/cstor/nfs2',
           '/var/lib/libvirt/cstor/nfs3', '/var/lib/libvirt/cstor/nfs4', '/var/lib/libvirt/cstor/nfs5'
-          , '/var/lib/libvirt/cstor/nfs6'
-          , '/var/lib/libvirt/cstor/nfs7'
-          , '/var/lib/libvirt/cstor/nfs8']
+          , '/var/lib/libvirt/cstor/nfs6']
 
+# mounts = ['/var/lib/libvirt/cstor/nfs1']
+
+# mounts = [
+#     '/home/nfs1/glusterfs/glusterfs1',
+#     '/home/nfs1/glusterfs/glusterfs2',
+#     '/home/nfs1/glusterfs/glusterfs3',
+#     '/home/nfs1/glusterfs/glusterfs4',
+#     '/home/nfs1/glusterfs/glusterfs5',
+#     '/home/nfs1/glusterfs/glusterfs6'
+# ]
 
 def run_container(path, port, cpu, mount='/tmp', image='mybench'):
     file_dir = '%s/%s' % (path, os.path.basename(path))
-    runCmd('mkdir %ss' % file_dir)
+    runCmd('mkdir %s' % file_dir)
     output = runCmd('docker run -d -m 1G --cpuset-cpus="%d" -v %s:%s -p %s:%s %s' % (cpu, file_dir, mount, port, DEFAULT_PORT, image))
     return output[0]
 
@@ -145,7 +152,7 @@ def benchmark(mount_paths, workload):
             result[i] = {}
             threads = {}
             for id in containers.keys():
-                t = MyThread(filebench, args=(workload, get_IP(), containers[id]))
+                t = MyThread(filebench, args=(workload, '133.133.135.22', containers[id]))
                 t.start()
                 threads[id] = t
 
@@ -176,16 +183,9 @@ print(workloads)
 for wk in workloads:
     benchmark(mounts, wk.replace('.f', ''))
 
-# workloads = ['fileserver', 'webserver', 'randomread']
+# workloads = ['fileserver', 'webserver', 'randomread', 'randomwrite', 'randomrw', 'filemicro_seqread', 'filemicro_seqwrite', 'filemicro_seqwriterand']
 # for wk in workloads:
 #     benchmark(mounts, wk)
-# mounts = [
-#     '/home/nfs1/glusterfs/glusterfs1',
-#     '/home/nfs1/glusterfs/glusterfs2',
-#     '/home/nfs1/glusterfs/glusterfs3',
-#     '/home/nfs1/glusterfs/glusterfs4',
-#     '/home/nfs1/glusterfs/glusterfs5',
-# ]
 
 # benchmark(mounts, 'fileserver')
 # benchmark(mounts, 'webserver')
