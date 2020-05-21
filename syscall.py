@@ -203,6 +203,11 @@ workloads = [
     'netsfs',
     'networkfs',
     'oltp',
+    'openfiles',
+    'tpcso',
+    'videoserver'
+    'webproxy'
+    'varmails',
     'randomfileaccss'
 ]
 for wk in workloads:
