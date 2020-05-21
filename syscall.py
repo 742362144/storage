@@ -13,9 +13,15 @@ DOCKER_DIR = '/sys/fs/cgroup/memory/docker'
 TRACE_DIR = '/root/'
 LTTNG_HOME = '/root/lttng-traces'
 
-mounts = ['/var/lib/libvirt/cstor/nfs1', '/var/lib/libvirt/cstor/nfs2',
-          '/var/lib/libvirt/cstor/nfs3', '/var/lib/libvirt/cstor/nfs4', '/var/lib/libvirt/cstor/nfs5'
-          , '/var/lib/libvirt/cstor/nfs6']
+mounts = [
+    '/var/lib/libvirt/cstor/nfs1',
+    '/var/lib/libvirt/cstor/nfs2',
+    '/var/lib/libvirt/cstor/nfs3',
+    '/var/lib/libvirt/cstor/nfs4',
+    '/var/lib/libvirt/cstor/nfs5',
+    '/var/lib/libvirt/cstor/nfs6'
+]
+
 
 # mounts = ['/home/nfs1']
 
@@ -31,7 +37,8 @@ mounts = ['/var/lib/libvirt/cstor/nfs1', '/var/lib/libvirt/cstor/nfs2',
 def run_container(path, port, cpu, mount='/tmp', image='mybench'):
     file_dir = '%s/%s' % (path, os.path.basename(path))
     runCmd('mkdir %s' % file_dir)
-    output = runCmd('docker run -d -m 1G --cpuset-cpus="%d" -v %s:%s -p %s:%s %s' % (cpu, file_dir, mount, port, DEFAULT_PORT, image))
+    output = runCmd('docker run -d -m 1G --cpuset-cpus="%d" -v %s:%s -p %s:%s %s' % (
+    cpu, file_dir, mount, port, DEFAULT_PORT, image))
     return output[0]
 
 
@@ -46,8 +53,9 @@ def get_container_pids(cid):
 
 def filebench(cid, workload, host, port):
     rpcCall("echo 'run times'>> /usr/local/share/filebench/workloads/%s.f" % workload, host=host, port=port)
-    collect_system(cid, workload)
+    pid = collect_system(cid, workload)
     output = rpcCall('filebench -f /usr/local/share/filebench/workloads/%s.f' % workload, host=host, port=port)
+    runCmd('kill -9 %s' % pid)
     return output
 
 
@@ -145,7 +153,7 @@ def benchmark(mount_paths, workload):
             while port in ports:
                 port = random.randint(19000, 20000)
             ports.add(port)
-            cid = run_container(path, port, i+4)
+            cid = run_container(path, port, i + 4)
             time.sleep(10)
 
             containers[cid] = port
@@ -179,14 +187,26 @@ def benchmark(mount_paths, workload):
             runCmd('rm -rf %s/%s' % (path, os.path.basename(path)))
         pass
 
-workloads = runCmd('ls /root/filebench-1.5-alpha3/workloads')
-print(workloads)
-for wk in workloads:
-    benchmark(mounts, wk.replace('.f', ''))
 
-# workloads = ['fileserver', 'webserver', 'randomread', 'randomwrite', 'randomrw', 'filemicro_seqread', 'filemicro_seqwrite', 'filemicro_seqwriterand']
+# workloads = runCmd('ls /root/filebench-1.5-alpha3/workloads')
+# print(workloads)
 # for wk in workloads:
-#     benchmark(mounts, wk)
+#     benchmark(mounts, wk.replace('.f', ''))
+
+workloads = [
+    'fileserver',
+    'webserver',
+    'randomread',
+    'randomwrite',
+    'randomrw',
+    'mongo',
+    'netsfs',
+    'networkfs',
+    'oltp',
+    'randomfileaccss'
+]
+for wk in workloads:
+    benchmark(mounts, wk)
 
 # benchmark(mounts, 'fileserver')
 # benchmark(mounts, 'webserver')
@@ -203,4 +223,3 @@ runCmd('mkdir nfs')
 
 for wk in workloads:
     runCmd('mv %s nfs/' % wk.replace('.f', ''))
-

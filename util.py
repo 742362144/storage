@@ -50,9 +50,13 @@ def get_IP():
 
 def collect_system(cid, workload):
     cmd = 'curl --unix-socket /var/run/docker.sock http://localhost/containers/%s/stats > %s.txt 2>/dev/null &' % (cid, workload)
-    os.system(cmd)
+    runCmd(cmd)
+    output = runCmd('ps -ef | grep curl | grep %s' % cid)
+    pid = output[0].split()[1]
+
+    return pid
 
 
 if __name__ == '__main__':
-    print(collect_system('ab789404daa7'))
+    print(collect_system('ab789404daa7', 'res'))
     # print(dumps(runCmd('ls /')))
