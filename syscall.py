@@ -17,7 +17,7 @@ mounts = ['/var/lib/libvirt/cstor/nfs1', '/var/lib/libvirt/cstor/nfs2',
           '/var/lib/libvirt/cstor/nfs3', '/var/lib/libvirt/cstor/nfs4', '/var/lib/libvirt/cstor/nfs5'
           , '/var/lib/libvirt/cstor/nfs6']
 
-# mounts = ['/var/lib/libvirt/cstor/nfs1']
+# mounts = ['/home/nfs1']
 
 # mounts = [
 #     '/home/nfs1/glusterfs/glusterfs1',
@@ -44,8 +44,9 @@ def get_container_pids(cid):
                 return runCmd('cat %s/cgroup.procs' % c_dir)
 
 
-def filebench(workload, host, port):
+def filebench(cid, workload, host, port):
     rpcCall("echo 'run times'>> /usr/local/share/filebench/workloads/%s.f" % workload, host=host, port=port)
+    collect_system(cid, workload)
     output = rpcCall('filebench -f /usr/local/share/filebench/workloads/%s.f' % workload, host=host, port=port)
     return output
 
@@ -150,19 +151,17 @@ def benchmark(mount_paths, workload):
             containers[cid] = port
             i += 1
             result[i] = {}
-            threads = {}
+            filebench_threads = {}
             for id in containers.keys():
-                t = MyThread(filebench, args=(workload, '133.133.135.22', containers[id]))
+                t = MyThread(filebench, args=(id, workload, '133.133.135.22', containers[id]))
                 t.start()
-                threads[id] = t
+                filebench_threads[id] = t
 
+            for id in filebench_threads.keys():
+                filebench_threads[id].join()
 
-
-            for id in threads.keys():
-                threads[id].join()
-
-            for id in threads.keys():
-                output = threads[id].get_result()
+            for id in filebench_threads.keys():
+                output = filebench_threads[id].get_result()
                 result[i][id] = {}
                 result[i][id]['output'] = output
         for id in containers.keys():

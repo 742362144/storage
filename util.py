@@ -1,6 +1,8 @@
+import os
 import subprocess
 import socket
 import threading
+import time
 from json import dumps
 
 
@@ -46,11 +48,11 @@ def get_IP():
     myaddr = socket.gethostbyname(myname)
     return myaddr
 
-def collect_system(cid):
-    runCmd('curl --unix-socket /var/run/docker.sock http://localhost/containers/%s/stats > res.txt' % cid)
-
+def collect_system(cid, workload):
+    cmd = 'curl --unix-socket /var/run/docker.sock http://localhost/containers/%s/stats > %s.txt 2>/dev/null &' % (cid, workload)
+    os.system(cmd)
 
 
 if __name__ == '__main__':
-    print(get_IP())
+    print(collect_system('ab789404daa7'))
     # print(dumps(runCmd('ls /')))
