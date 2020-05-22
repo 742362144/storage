@@ -194,34 +194,36 @@ def benchmark(mount_paths, workload):
 #     benchmark(mounts, wk.replace('.f', ''))
 
 
+# workloads = [
+#     'fileserver',
+#     'webserver',
+#     'randomread',
+#     'randomwrite',
+#     'randomrw',
+#     'mongo',
+#     'netsfs',
+#     'networkfs',
+#     'oltp',
+#     'openfiles',
+#     'tpcso',
+#     'videoserver',
+#     'webproxy',
+#     'varmails',
+#     'randomfileaccss'
+# ]
 workloads = [
-    'fileserver',
     'webserver',
-    'randomread',
-    'randomwrite',
-    'randomrw',
-    'mongo',
     'netsfs',
     'networkfs',
     'oltp',
-    'openfiles',
     'tpcso',
-    'videoserver'
-    'webproxy'
+    'videoserver',
+    'webproxy',
     'varmails',
     'randomfileaccss'
 ]
 for wk in workloads:
     benchmark(mounts, wk)
-
-# benchmark(mounts, 'fileserver')
-# benchmark(mounts, 'webserver')
-# benchmark(mounts, 'randomread')
-# benchmark(mounts, 'randomwrite')
-# benchmark(mounts, 'randomrw')
-# benchmark(mounts, 'filemicro_seqread')
-# benchmark(mounts, 'filemicro_seqwrite')
-# benchmark(mounts, 'filemicro_seqwriterand')
 
 runCmd('cd /tmp/pycharm_project_533')
 runCmd('rm -rf nfs')
