@@ -51,9 +51,9 @@ def get_container_pids(cid):
                 return runCmd('cat %s/cgroup.procs' % c_dir)
 
 
-def filebench(cid, workload, host, port):
+def filebench(nums, cid, workload, host, port):
     rpcCall("echo 'run times'>> /usr/local/share/filebench/workloads/%s.f" % workload, host=host, port=port)
-    pid = collect_system(cid, workload)
+    pid = collect_system(nums, cid, workload)
     output = rpcCall('filebench -f /usr/local/share/filebench/workloads/%s.f' % workload, host=host, port=port)
     runCmd('kill -9 %s' % pid)
     return output
@@ -146,7 +146,7 @@ def benchmark(mount_paths, workload):
     result = {}
     containers = {}
     ports = set()
-    i = 1
+    i = 0
     try:
         for path in mount_paths:
             port = random.randint(19000, 20000)
@@ -161,7 +161,7 @@ def benchmark(mount_paths, workload):
             result[i] = {}
             filebench_threads = {}
             for id in containers.keys():
-                t = MyThread(filebench, args=(id, workload, '133.133.135.22', containers[id]))
+                t = MyThread(filebench, args=(i, id, workload, '133.133.135.22', containers[id]))
                 t.start()
                 filebench_threads[id] = t
 
@@ -192,6 +192,7 @@ def benchmark(mount_paths, workload):
 # print(workloads)
 # for wk in workloads:
 #     benchmark(mounts, wk.replace('.f', ''))
+
 
 workloads = [
     'fileserver',

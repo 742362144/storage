@@ -48,8 +48,8 @@ def get_IP():
     myaddr = socket.gethostbyname(myname)
     return myaddr
 
-def collect_system(cid, workload):
-    cmd = 'curl --unix-socket /var/run/docker.sock http://localhost/containers/%s/stats > %s.txt 2>/dev/null &' % (cid, workload)
+def collect_system(nums, cid, workload):
+    cmd = 'curl --unix-socket /var/run/docker.sock http://localhost/containers/%s/stats > %s_%d_%s.txt 2>/dev/null &' % (cid, workload, nums, cid)
     runCmd(cmd)
     output = runCmd('ps -ef | grep curl | grep %s' % cid)
     pid = output[0].split()[1]
