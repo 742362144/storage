@@ -13,26 +13,24 @@ DOCKER_DIR = '/sys/fs/cgroup/memory/docker'
 TRACE_DIR = '/root/'
 LTTNG_HOME = '/root/lttng-traces'
 
-mounts = [
-    '/var/lib/libvirt/cstor/nfs1',
-    '/var/lib/libvirt/cstor/nfs2',
-    '/var/lib/libvirt/cstor/nfs3',
-    '/var/lib/libvirt/cstor/nfs4',
-    '/var/lib/libvirt/cstor/nfs5',
-    '/var/lib/libvirt/cstor/nfs6'
-]
-
-
-# mounts = ['/home/nfs1']
-
 # mounts = [
-#     '/home/nfs1/glusterfs/glusterfs1',
-#     '/home/nfs1/glusterfs/glusterfs2',
-#     '/home/nfs1/glusterfs/glusterfs3',
-#     '/home/nfs1/glusterfs/glusterfs4',
-#     '/home/nfs1/glusterfs/glusterfs5',
-#     '/home/nfs1/glusterfs/glusterfs6'
+#     '/var/lib/libvirt/cstor/nfs1',
+#     '/var/lib/libvirt/cstor/nfs2',
+#     '/var/lib/libvirt/cstor/nfs3',
+#     '/var/lib/libvirt/cstor/nfs4',
+#     '/var/lib/libvirt/cstor/nfs5',
+#     '/var/lib/libvirt/cstor/nfs6'
 # ]
+
+
+mounts = [
+    '/home/nfs1/glusterfs/glusterfs1',
+    '/home/nfs1/glusterfs/glusterfs2',
+    '/home/nfs1/glusterfs/glusterfs3',
+    '/home/nfs1/glusterfs/glusterfs4',
+    '/home/nfs1/glusterfs/glusterfs5',
+    '/home/nfs1/glusterfs/glusterfs6'
+]
 
 def run_container(path, port, cpu, mount='/tmp', image='mybench'):
     file_dir = '%s/%s' % (path, os.path.basename(path))
@@ -194,40 +192,40 @@ def benchmark(mount_paths, workload):
 #     benchmark(mounts, wk.replace('.f', ''))
 
 
-# workloads = [
-#     'fileserver',
-#     'webserver',
-#     'randomread',
-#     'randomwrite',
-#     'randomrw',
-#     'mongo',
-#     'netsfs',
-#     'networkfs',
-#     'oltp',
-#     'openfiles',
-#     'tpcso',
-#     'videoserver',
-#     'webproxy',
-#     'varmails',
-#     'randomfileaccss'
-# ]
 workloads = [
+    'fileserver',
     'webserver',
+    'randomread',
+    'randomwrite',
+    'randomrw',
+    'mongo',
     'netsfs',
     'networkfs',
     'oltp',
+    'openfiles',
     'tpcso',
     'videoserver',
     'webproxy',
     'varmails',
     'randomfileaccss'
 ]
+# workloads = [
+#     'webserver',
+#     'netsfs',
+#     'networkfs',
+#     'oltp',
+#     'tpcso',
+#     'videoserver',
+#     'webproxy',
+#     'varmails',
+#     'randomfileaccss'
+# ]
 for wk in workloads:
     benchmark(mounts, wk)
 
 runCmd('cd /tmp/pycharm_project_533')
-runCmd('rm -rf nfs')
-runCmd('mkdir nfs')
+runCmd('rm -rf glusterfs')
+runCmd('mkdir glusterfs')
 
 for wk in workloads:
-    runCmd('mv %s nfs/' % wk.replace('.f', ''))
+    runCmd('mv %s glusterfs/' % wk.replace('.f', ''))
