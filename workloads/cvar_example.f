@@ -14,4 +14,4 @@ define process name=filereader,instances=1
   }
 }
 
-run 60
+run 5

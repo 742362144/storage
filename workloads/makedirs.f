@@ -42,3 +42,5 @@ define process name=dirmake,instances=1
 }
 
 echo  "MakeDirs Version 1.0 personality successfully loaded"
+
+run 5

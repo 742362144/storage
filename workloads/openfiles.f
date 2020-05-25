@@ -42,3 +42,5 @@ define process name=fileopen,instances=1
 }
 
 echo  "Openfiles Version 1.0 personality successfully loaded"
+
+run 5

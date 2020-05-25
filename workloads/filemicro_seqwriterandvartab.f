@@ -52,3 +52,5 @@ define process name=filewriter,instances=1
 }
 
 echo  "FileMicro-SeqWriteRandVarTab Version 1.1 personality successfully loaded"
+
+run 5

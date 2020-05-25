@@ -99,3 +99,5 @@ define process name=delproc {
 }
 
 echo  "Create-Delete Swing personality Ver. 1.0 successfully loaded"
+
+run 5

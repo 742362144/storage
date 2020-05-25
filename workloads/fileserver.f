@@ -53,4 +53,4 @@ define process name=filereader,instances=1
 
 echo  "File-server Version 3.0 personality successfully loaded"
 
-run 60
+run 5

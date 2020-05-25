@@ -59,3 +59,5 @@ define process name=seqread,instances=1
 }
 
 echo  "Five Stream Read Version 3.0 personality successfully loaded"
+
+run 5
