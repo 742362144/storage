@@ -37,7 +37,9 @@ def run_container(path, port, cpu, mount='/tmp', image='mybench'):
     runCmd('mkdir %s' % file_dir)
     output = runCmd('docker run -d -m 1G --cpuset-cpus="%d" -v %s:%s -p %s:%s %s' % (
     cpu, file_dir, mount, port, DEFAULT_PORT, image))
-    return output[0]
+    cid = output[0]
+    runCmd('docker cp workloads %s:/usr/local/share/filebench')
+    return cid
 
 
 def get_container_pids(cid):
@@ -50,7 +52,7 @@ def get_container_pids(cid):
 
 
 def filebench(nums, cid, workload, host, port):
-    rpcCall("echo 'run times'>> /usr/local/share/filebench/workloads/%s.f" % workload, host=host, port=port)
+    # rpcCall("echo 'run times'>> /usr/local/share/filebench/workloads/%s.f" % workload, host=host, port=port)
     pid = collect_system(nums, cid, workload)
     output = rpcCall('filebench -f /usr/local/share/filebench/workloads/%s.f' % workload, host=host, port=port)
     runCmd('kill -9 %s' % pid)
