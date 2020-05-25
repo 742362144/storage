@@ -13,24 +13,24 @@ DOCKER_DIR = '/sys/fs/cgroup/memory/docker'
 TRACE_DIR = '/root/'
 LTTNG_HOME = '/root/lttng-traces'
 
-# mounts = [
-#     '/var/lib/libvirt/cstor/nfs1',
-#     '/var/lib/libvirt/cstor/nfs2',
-#     '/var/lib/libvirt/cstor/nfs3',
-#     '/var/lib/libvirt/cstor/nfs4',
-#     '/var/lib/libvirt/cstor/nfs5',
-#     '/var/lib/libvirt/cstor/nfs6'
-# ]
-
-
 mounts = [
-    '/home/nfs1/glusterfs/glusterfs1',
-    '/home/nfs1/glusterfs/glusterfs2',
-    '/home/nfs1/glusterfs/glusterfs3',
-    '/home/nfs1/glusterfs/glusterfs4',
-    '/home/nfs1/glusterfs/glusterfs5',
-    '/home/nfs1/glusterfs/glusterfs6'
+    '/home/nfs/nfs1',
+    '/home/nfs/nfs2',
+    '/home/nfs/nfs3',
+    '/home/nfs/nfs4',
+    '/home/nfs/nfs5',
+    '/home/nfs/nfs6'
 ]
+
+
+# mounts = [
+#     '/home/nfs1/glusterfs/glusterfs1',
+#     '/home/nfs1/glusterfs/glusterfs2',
+#     '/home/nfs1/glusterfs/glusterfs3',
+#     '/home/nfs1/glusterfs/glusterfs4',
+#     '/home/nfs1/glusterfs/glusterfs5',
+#     '/home/nfs1/glusterfs/glusterfs6'
+# ]
 
 def run_container(path, port, cpu, mount='/tmp', image='mybench'):
     file_dir = '%s/%s' % (path, os.path.basename(path))
@@ -224,8 +224,8 @@ for wk in workloads:
     benchmark(mounts, wk)
 
 runCmd('cd /tmp/pycharm_project_533')
-runCmd('rm -rf glusterfs')
-runCmd('mkdir glusterfs')
+runCmd('rm -rf nfs')
+runCmd('mkdir nfs')
 
 for wk in workloads:
-    runCmd('mv %s glusterfs/' % wk.replace('.f', ''))
+    runCmd('mv %s nfs/' % wk.replace('.f', ''))
