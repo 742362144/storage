@@ -38,7 +38,7 @@ def run_container(path, port, cpu, mount='/tmp', image='mybench'):
     output = runCmd('docker run -d -m 1G --cpuset-cpus="%d" -v %s:%s -p %s:%s %s' % (
     cpu, file_dir, mount, port, DEFAULT_PORT, image))
     cid = output[0]
-    runCmd('docker cp workloads %s:/usr/local/share/filebench')
+    runCmd('docker cp workloads %s:/usr/local/share/filebench' % cid)
     return cid
 
 
