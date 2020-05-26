@@ -159,7 +159,7 @@ def benchmark(mount_paths, workload):
                 port = random.randint(19000, 20000)
             ports.add(port)
             cid = run_container(path, port, i + 4)
-            time.sleep(10)
+            time.sleep(30)
 
             containers[cid] = port
             i += 1
@@ -263,7 +263,7 @@ def syscall(mount_paths, workload):
 #     'randomfileaccss'
 # ]
 workloads = [
-    'randomread'
+    'webproxy'
 ]
 for wk in workloads:
     syscall(mounts, wk)

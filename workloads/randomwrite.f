@@ -26,7 +26,7 @@
 set $dir=/tmp
 set $filesize=5g
 set $iosize=8k
-set $nthreads=1
+set $nthreads=6
 set $workingset=0
 set $directio=0
 
