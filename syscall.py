@@ -13,15 +13,22 @@ DOCKER_DIR = '/sys/fs/cgroup/memory/docker'
 TRACE_DIR = '/root/'
 LTTNG_HOME = '/root/lttng-traces'
 
+# mounts = [
+#     '/home/nfs/nfs1',
+#     '/home/nfs/nfs2',
+#     '/home/nfs/nfs3',
+#     '/home/nfs/nfs4',
+#     '/home/nfs/nfs5',
+#     '/home/nfs/nfs6'
+# ]
+
 mounts = [
     '/home/nfs/nfs1',
     '/home/nfs/nfs2',
     '/home/nfs/nfs3',
     '/home/nfs/nfs4',
-    '/home/nfs/nfs5',
-    '/home/nfs/nfs6'
+    '/home/nfs/nfs5'
 ]
-
 
 # mounts = [
 #     '/home/nfs1/glusterfs/glusterfs1',
@@ -53,9 +60,11 @@ def get_container_pids(cid):
 
 def filebench(nums, cid, workload, host, port):
     # rpcCall("echo 'run times'>> /usr/local/share/filebench/workloads/%s.f" % workload, host=host, port=port)
-    pid = collect_system(nums, cid, workload)
+    # pid = collect_system(nums, cid, workload)
+    output = runCmd('docker exec eb84f4bd9fdf sysdig container.id=%s >  %s.log 2>/dev/null &' % (cid, cid))
+    # pid = output[0].split()[1]
     output = rpcCall('filebench -f /usr/local/share/filebench/workloads/%s.f' % workload, host=host, port=port)
-    runCmd('kill -9 %s' % pid)
+    # runCmd('kill -9 %s' % pid)
     return output
 
 
@@ -154,7 +163,7 @@ def benchmark(mount_paths, workload):
                 port = random.randint(19000, 20000)
             ports.add(port)
             cid = run_container(path, port, i + 4)
-            time.sleep(10)
+            time.sleep(5)
 
             containers[cid] = port
             i += 1
@@ -187,6 +196,52 @@ def benchmark(mount_paths, workload):
             runCmd('rm -rf %s/%s' % (path, os.path.basename(path)))
         pass
 
+def syscall(mount_paths, workload):
+    # start container
+    result = {}
+    containers = {}
+    ports = set()
+    i = 6
+    try:
+        for path in mount_paths:
+            port = random.randint(19000, 20000)
+            while port in ports:
+                port = random.randint(19000, 20000)
+            ports.add(port)
+            cid = run_container(path, port, i + 4)
+            time.sleep(5)
+
+            containers[cid] = port
+
+        result[i] = {}
+        filebench_threads = {}
+        for id in containers.keys():
+            t = MyThread(filebench, args=(i, id, workload, '133.133.135.22', containers[id]))
+            t.start()
+            filebench_threads[id] = t
+
+        for id in filebench_threads.keys():
+            filebench_threads[id].join()
+
+        for id in filebench_threads.keys():
+            output = filebench_threads[id].get_result()
+            result[i][id] = {}
+            result[i][id]['output'] = output
+
+        for id in containers.keys():
+            runCmd('docker rm -f %s' % id)
+        for path in mount_paths:
+            runCmd('rm -rf %s/%s' % (path, os.path.basename(path)))
+        print(result)
+        with open(workload, 'w') as f:
+            f.write(dumps(result))
+    except Exception:
+        traceback.print_exc()
+        for id in containers.keys():
+            runCmd('docker rm -f %s' % id)
+        for path in mount_paths:
+            runCmd('rm -rf %s/%s' % (path, os.path.basename(path)))
+        pass
 
 # workloads = runCmd('ls /root/filebench-1.5-alpha3/workloads')
 # print(workloads)
@@ -194,36 +249,28 @@ def benchmark(mount_paths, workload):
 #     benchmark(mounts, wk.replace('.f', ''))
 
 
-workloads = [
-    'fileserver',
-    'webserver',
-    'randomread',
-    'randomwrite',
-    'randomrw',
-    'mongo',
-    'netsfs',
-    'networkfs',
-    'oltp',
-    'openfiles',
-    'tpcso',
-    'videoserver',
-    'webproxy',
-    'varmails',
-    'randomfileaccss'
-]
 # workloads = [
+#     'fileserver',
 #     'webserver',
+#     'randomread',
+#     'randomwrite',
+#     'randomrw',
+#     'mongo',
 #     'netsfs',
 #     'networkfs',
 #     'oltp',
+#     'openfiles',
 #     'tpcso',
 #     'videoserver',
 #     'webproxy',
 #     'varmails',
 #     'randomfileaccss'
 # ]
+workloads = [
+    'randomread'
+]
 for wk in workloads:
-    benchmark(mounts, wk)
+    syscall(mounts, wk)
 
 runCmd('cd /tmp/pycharm_project_533')
 runCmd('rm -rf nfs')

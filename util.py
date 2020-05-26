@@ -14,7 +14,7 @@ def runCmd(cmd):
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     try:
         std_out = p.stdout.readlines()
-        std_err = p.stderr.readlines()
+        # std_err = p.stderr.readlines()
         if std_out:
             result = []
             for line in std_out:
@@ -58,5 +58,6 @@ def collect_system(nums, cid, workload):
 
 
 if __name__ == '__main__':
-    print(collect_system('ab789404daa7', 'res'))
+    # print(collect_system('ab789404daa7', 'res'))
     # print(dumps(runCmd('ls /')))
+    print(runCmd('docker exec eb84f4bd9fdf sysdig container.id=eb84f4bd9fdf >  eb84f4bd9fdf.log &'))
