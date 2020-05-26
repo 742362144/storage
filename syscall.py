@@ -23,11 +23,7 @@ LTTNG_HOME = '/root/lttng-traces'
 # ]
 
 mounts = [
-    '/home/nfs/nfs1',
-    '/home/nfs/nfs2',
-    '/home/nfs/nfs3',
-    '/home/nfs/nfs4',
-    '/home/nfs/nfs5'
+    '/home/nfs/nfs1'
 ]
 
 # mounts = [
@@ -61,7 +57,7 @@ def get_container_pids(cid):
 def filebench(nums, cid, workload, host, port):
     # rpcCall("echo 'run times'>> /usr/local/share/filebench/workloads/%s.f" % workload, host=host, port=port)
     # pid = collect_system(nums, cid, workload)
-    output = runCmd('docker exec eb84f4bd9fdf sysdig container.id=%s >  %s.log 2>/dev/null &' % (cid, cid))
+    output = runCmd('docker exec eb84f4bd9fdf sysdig container.id=%s and proc.name=filebench >  %s.log 2>/dev/null &' % (cid[:12], cid[:12]))
     # pid = output[0].split()[1]
     output = rpcCall('filebench -f /usr/local/share/filebench/workloads/%s.f' % workload, host=host, port=port)
     # runCmd('kill -9 %s' % pid)
@@ -163,7 +159,7 @@ def benchmark(mount_paths, workload):
                 port = random.randint(19000, 20000)
             ports.add(port)
             cid = run_container(path, port, i + 4)
-            time.sleep(5)
+            time.sleep(10)
 
             containers[cid] = port
             i += 1
